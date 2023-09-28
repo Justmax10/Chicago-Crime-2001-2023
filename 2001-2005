@@ -1,0 +1,45 @@
+#import all files that I may need to explore and clean the data
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sea
+
+df = pd.read_csv ('2001-2005.csv')
+#explored the column names in the dataset
+df.columns
+#checked for duplicates in the dataset
+df[df.duplicated()]
+#checked for duplicates on the ID column
+df[df.duplicated('ID')]
+#checked for duplicates on the Case Number
+df[df.duplicated('Case Number')]
+#Found 95 rows with duplicates on the Case Number column, 
+#decided to delete the duplicates since they were caused by multiple calls for the same crime 
+
+df.drop_duplicates(subset='Case Number', keep='first', inplace=True)
+#checked to make sure the duplicats on Case Number were deleted
+df[df.duplicated('Case Number')]
+#checked the number of null values in each column
+df.isnull().sum()
+#checked the data types in the dataset
+df.dtypes
+#explored how many arrest were made from 2001-2005
+arrest_count = df['Arrest'].sum()
+
+arrest_count
+#checked to see what types of crime were in the dataset
+df['Primary Type'].unique()
+#renamed the Primary Type Crim Sexual Assult to Criminal Sexual Assault
+df.replace('CRIM SEXUAL ASSAULT', 'CRIMINAL SEXUAL ASSAULT', inplace=True)
+#changed the data type of the column Datee from object to datetime
+df['Date'] = pd.to_datetime(df['Date'])
+#checked to see how many arrest were made by year and Primary Type
+arrests_by_year_by_type = df.groupby(['Year', 'Primary Type'])['Arrest'].sum().reset_index()
+
+
+arrests_by_year_by_type
+#checked to see how many arrest were made by year and the beat 
+arrests_by_year_by_beat = df.groupby(['Year', 'Beat'])['Arrest'].sum().reset_index()
+
+arrests_by_year_by_beat
+#exported the dateframe into csv in order to upload it into Tableau to continue my analyst 
+df.to_csv('Chicago Crime 2001-2005.csv', index=False)  
